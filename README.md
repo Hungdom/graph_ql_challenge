@@ -25,3 +25,7 @@ Cchange variable work_space in Input/.py:
 work_space = '/place/to/graph_ql_challenge/Input'
 ```
 
+neo4j://18.140.2.236:7687
+
+
+http://18.140.2.236:7474/browser/
