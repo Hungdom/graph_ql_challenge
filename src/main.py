@@ -4,8 +4,6 @@ import os
 import shutil
 import datetime
 
-
-
 class Seeker:
 
     def __init__(self, uri, user, password):
@@ -13,7 +11,6 @@ class Seeker:
 
     def close(self):
         self.driver.close()
-
 
     @staticmethod
     def get_seeker(tx):
@@ -88,7 +85,6 @@ def write_output_csv(seeker_master_output, src_dir):
 
 if __name__ == "__main__":
     executor = Seeker("bolt://localhost:7687", "neo4j", "dominic")
-
     work_space = '/mnt/d/Projects/github/graph_ql_challenge'
 
     exec_with_csv_data(executor, work_space + '/Input/seekers.csv')

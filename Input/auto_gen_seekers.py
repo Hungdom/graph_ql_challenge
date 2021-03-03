@@ -12,13 +12,13 @@ def get_one_random_domain(domains):
     return random.choice(domains)
 
 def get_one_random_name(letters):
-    return ''.join(random.choice(letters) for i in range(5))
+    return ''.join(random.choice(letters) for i in range(4))
 
 def generate_random_emails():
     return get_one_random_name(letters) + '@' + get_one_random_domain(domains)
 
 def generate_random_phone():
-    return random.randint(10000, 99999)
+    return random.randint(1000, 9999)
 
 def generate_random_name():
     return names.get_first_name()
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     work_space = '/mnt/d/Projects/github/graph_ql_challenge/Input'
     latest_sid = int(get_sid(work_space))
 
-    num_loop = 1000
+    num_loop = 3
 
 
     with open(work_space + '/seekers.csv', mode='w') as csv_file:
