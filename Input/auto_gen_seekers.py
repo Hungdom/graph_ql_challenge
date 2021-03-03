@@ -39,10 +39,10 @@ def set_sid(new_sid):
 
 if __name__ == "__main__":
     # seekers: { sid, name, email, phone }
-    work_space = '/mnt/d/Projects/github/graph_ql_challenge/Input'
+    work_space = '/home/ubuntu/graph_ql_challenge/Input'
     latest_sid = int(get_sid(work_space))
 
-    num_loop = 1000
+    num_loop = 30
 
 
     with open(work_space + '/seekers.csv', mode='w') as csv_file:

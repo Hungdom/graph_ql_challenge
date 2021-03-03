@@ -59,7 +59,7 @@ def exec_with_csv_data(executor:Seeker, path_input):
         print(f'Processed {line_count} lines.')
 
     # backup data
-    backup_input_data('/mnt/d/Projects/github/graph_ql_challenge/Input/')
+    backup_input_data('/home/ubuntu/graph_ql_challenge/Input/')
 
 def backup_input_data(src_dir):
     import datetime
@@ -85,7 +85,7 @@ def write_output_csv(seeker_master_output, src_dir):
 
 if __name__ == "__main__":
     executor = Seeker("bolt://18.140.2.236:7687", "neo4j", "hungle")
-    work_space = '/mnt/d/Projects/github/graph_ql_challenge'
+    work_space = '/home/ubuntu/graph_ql_challenge'
 
     exec_with_csv_data(executor, work_space + '/Input/seekers.csv')
     seekers = executor.get_results()
