@@ -109,7 +109,7 @@ sid, name, email, phone
 
 ### 6. Loop to get output
 
-
+    MATCH (n:Seeker) RETURN n._id, n.sid
 
 ## output:
 ```
