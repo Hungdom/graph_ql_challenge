@@ -55,36 +55,47 @@ sid, name, email, phone
 
 ### 3. Merge and add relation ship.
     ```
-    create (n:Seeker {sid:1, name:"aaa", email: "aaa@g.com", phone:12345});
+    create (n:Seeker {sid:1, name:"aaa", email: "aaa@g.com", phone:12345, _id:0})
+
 
     MERGE (a:Seeker {sid:2, name:"aab", email: "aaa@g.com", phone:12333})
+    ON CREATE SET a._id = id(a)
 
     MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
     and a.sid = 2 and b.sid <> 2
+    SET a._id = b._id
     MERGE (a)-[r:link]->(b);
 
-    MERGE (n:Seeker {sid:3, name:"abb", email: "aaa@g.com", phone:12222})
+    MERGE (a:Seeker {sid:3, name:"abb", email: "aaa@g.com", phone:12222})
+    ON CREATE SET a._id = id(a)
 
     MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
     and a.sid = 3 and b.sid <> 3
+        SET a._id = b._id
     MERGE (a)-[r:link]->(b);
 
-    MERGE (n:Seeker {sid:4, name:"ddd", email: "ddd@g.com", phone:12222})
+    MERGE (a:Seeker {sid:4, name:"ddd", email: "ddd@g.com", phone:12222})
+    ON CREATE SET a._id = id(a)
 
     MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
     and a.sid = 4 and b.sid <> 4
+        SET a._id = b._id
     MERGE (a)-[r:link]->(b);
 
-    MERGE (n:Seeker {sid:5, name:"eee", email: "eee@g.com", phone:56666})
+    MERGE (a:Seeker {sid:5, name:"eee", email: "eee@g.com", phone:56666})
+    ON CREATE SET a._id = id(a);
 
     MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
     and a.sid = 5 and b.sid <> 5
+        SET a._id = b._id
     MERGE (a)-[r:link]->(b);
 
-    MERGE (n:Seeker {sid:6, name:"eff", email: "eee@g.com", phone:55555})
+    MERGE (a:Seeker {sid:6, name:"eff", email: "eee@g.com", phone:55555})
+    ON CREATE SET a._id = id(a);
 
     MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
     and a.sid = 6 and b.sid <> 6
+        SET a._id = b._id
     MERGE (a)-[r:link]->(b);
     ```
 
@@ -95,6 +106,10 @@ sid, name, email, phone
 ### 5. Create UNIQUE:
 
     CREATE CONSTRAINT ON (n:Seeker) ASSERT n.sid IS UNIQUE;
+
+### 6. Loop to get output
+
+
 
 ## output:
 ```
