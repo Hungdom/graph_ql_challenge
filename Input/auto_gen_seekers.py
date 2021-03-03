@@ -42,7 +42,7 @@ if __name__ == "__main__":
     work_space = '/mnt/d/Projects/github/graph_ql_challenge/Input'
     latest_sid = int(get_sid(work_space))
 
-    num_loop = 3
+    num_loop = 30
 
 
     with open(work_space + '/seekers.csv', mode='w') as csv_file:
