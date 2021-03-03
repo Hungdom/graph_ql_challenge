@@ -62,7 +62,13 @@ def exec_with_csv_data(executor:Seeker, path_input):
         print(f'Processed {line_count} lines.')
 
     # backup data
-    shutil.move('/mnt/d/Projects/github/graph_ql_challenge/Input/sample_input.csv', '/mnt/d/Projects/github/graph_ql_challenge/Input/bk/sample_input.csv')
+    import datetime
+
+    now = str(datetime.datetime.now())[:19]
+    now = now.replace(":","_").replace(" ", "")
+    src_dir = '/mnt/d/Projects/github/graph_ql_challenge/Input/'
+    shutil.move(src_dir + 'sample_input.csv', 
+        src_dir + 'bk/sample_input.csv' + str(now))
 
     # Write back to sample_input.csv
 
