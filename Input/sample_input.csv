@@ -1,4 +1,3 @@
-input:
 sid, name, email, phone
 1, aaa, aaa@g.com, 12345
 2, aab, aaa@g.com, 12333
@@ -7,13 +6,3 @@ sid, name, email, phone
 5, daa, bcd@g.com, 12222
 6, eee, eee@g.com, 55555
 7, eff, eee@g.com, 56666
-
-output:
-id, sid
-1, 1
-1, 2
-1, 3
-1, 4
-1, 5
-2, 6
-2, 7
