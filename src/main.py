@@ -46,7 +46,8 @@ class Seeker:
 
     @staticmethod
     def _create_one_seeker(tx, _sid, _name, _email, _phone):
-        tx.run("MERGE (a:Seeker {sid:$sid, name:$name, email: $email, phone:$phone}) ", sid=_sid, name=_name, email=_email, phone=_phone)
+        tx.run("MERGE (a:Seeker {sid:$sid, name:$name, email: $email, phone:$phone}) "
+                "ON CREATE SET a._id = id(a); ", sid=_sid, name=_name, email=_email, phone=_phone)
 
     def merge_all_seekers(self):
         with self.driver.session() as session:
@@ -68,9 +69,9 @@ class Seeker:
             seekers = []
             result = session.run("MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) "
                                     "and a.sid <> b.sid "
-                                    "SET a._id = id(b) "
+                                    "SET b._id = id(a) "
                                     "MERGE (a)-[r:link]->(b) "
-                                    "RETURN a._id as ID, a.sid as SID")
+                                    "RETURN DISTINCT a._id as ID, a.sid as SID")
             for record in result:
                 seekers.append({'id':record["ID"], 'sid': record["SID"]})
             return seekers
@@ -134,7 +135,7 @@ def add_all_node_from_csv(executor, path_input, work_space):
         print(f'Processed {line_count} lines.')
 
     # backup data
-    backup_input_data(work_space +'/Input/')
+    # backup_input_data(work_space +'/Input/')
 
 def add_iterable_node(executor, work_space):
     exec_with_csv_data(executor, work_space + '/Input/seekers.csv', work_space)
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     # add_iterable_node(executor, work_space)
 
     # process_all_node(executor, work_space)
-
+    
     process_all_node_in_one_query(executor, work_space)
 
     executor.close()

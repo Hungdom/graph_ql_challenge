@@ -62,7 +62,7 @@ sid, name, email, phone
     ON CREATE SET a._id = id(a)
 
     MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone )
-    and a.sid <> b.sid
+    and a.sid <> b.sid and id(a) <> b._id
     SET a._id = id(b)
     MERGE (a)-[r:link]->(b)
     RETURN a._id, a.sid
@@ -124,3 +124,56 @@ id, sid
 2, 6
 2, 7
 ```
+
+
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
+AND a.sid <> b.sid AND a._id <> 0
+SET a._id = 0
+MERGE (a)-[r:link]->(b)
+RETURN a._id, a.sid
+
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) AND a.sid ="2"
+AND a.sid <> b.sid
+SET a._id = 0
+MERGE (a)-[r:link]->(b)
+
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) AND a.sid ="7"
+AND a.sid <> b.sid AND b._id <> 0
+SET a._id = 0
+MERGE (a)-[r:link]->(b)
+
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone)
+AND a.sid <> b.sid AND b._id <> a._id
+SET b._id = a._id
+MERGE (a)-[r:link]->(b)
+RETURN b._id, b.sid
+
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone)
+AND a.sid <> b.sid AND b._id <> a._id
+SET b._id = a._id
+MERGE (a)-[r:link]->(b)
+RETURN b._id, b.sid
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone)
+AND a.sid <> b.sid AND b._id <> a._id
+SET b._id = a._id
+MERGE (a)-[r:link]->(b)
+RETURN b._id, b.sid
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone)
+AND a.sid <> b.sid AND b._id <> a._id
+SET b._id = a._id
+MERGE (a)-[r:link]->(b)
+RETURN b._id, b.sid
+
+
+MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone)
+AND a.sid <> b.sid AND b._id <> a._id
+SET b._id = a._id
+MERGE (a)-[r:link]-(b)
+RETURN a._id, a.sid
