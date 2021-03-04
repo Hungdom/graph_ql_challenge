@@ -23,16 +23,14 @@ class Seeker:
     def get_results(self):
         with self.driver.session() as session:
             seekers = session.read_transaction(self.get_seeker)
-            
             return seekers
-
 
     def merge_seeker(self, _sid, _name, _email, _phone):
         with self.driver.session() as session:
-            session.write_transaction(self._create_one_seeker, _sid, _name, _email, _phone)
+            session.write_transaction(self._create_one_seeker_and_merge, _sid, _name, _email, _phone)
             
     @staticmethod
-    def _create_one_seeker(tx, _sid, _name, _email, _phone):
+    def _create_one_seeker_and_merge(tx, _sid, _name, _email, _phone):
 
         tx.run("MERGE (a:Seeker {sid:$sid, name:$name, email: $email, phone:$phone}) "
                 "ON CREATE SET a._id = id(a); ", sid=_sid, name=_name, email=_email, phone=_phone)
@@ -42,7 +40,43 @@ class Seeker:
                 "SET a._id = b._id "
                 "MERGE (a)-[r:link]->(b) ", sid=_sid)
 
-def exec_with_csv_data(executor:Seeker, path_input):
+    def add_seekers(self,  _sid, _name, _email, _phone):
+        with self.driver.session() as session:
+            session.write_transaction(self._create_one_seeker, _sid, _name, _email, _phone)
+
+    @staticmethod
+    def _create_one_seeker(tx, _sid, _name, _email, _phone):
+        tx.run("MERGE (a:Seeker {sid:$sid, name:$name, email: $email, phone:$phone}) ", sid=_sid, name=_name, email=_email, phone=_phone)
+
+    def merge_all_seekers(self):
+        with self.driver.session() as session:
+            seekers = session.write_transaction(self._merge_all_seekers)
+
+    @staticmethod
+    def _merge_all_seekers(tx):
+        seekers = []
+        result = tx.run("MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) "
+                        "and a.sid <> b.sid "
+                        "SET a._id = id(b) "
+                        "MERGE (a)-[r:link]->(b) ")
+        for record in result:
+            seekers.append({'id':record["ID"], 'sid': record["SID"]})
+        return seekers
+    
+    def merge_all_seekers_and_return(self):
+        with self.driver.session() as session:
+            seekers = []
+            result = session.run("MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) "
+                                    "and a.sid <> b.sid "
+                                    "SET a._id = id(b) "
+                                    "MERGE (a)-[r:link]->(b) "
+                                    "RETURN a._id as ID, a.sid as SID")
+            for record in result:
+                seekers.append({'id':record["ID"], 'sid': record["SID"]})
+            return seekers
+
+    
+def exec_with_csv_data(executor:Seeker, path_input, work_space):
     header = None
     with open(path_input) as csv_file:
         csv_data = csv.reader(csv_file, delimiter=',')
@@ -59,7 +93,7 @@ def exec_with_csv_data(executor:Seeker, path_input):
         print(f'Processed {line_count} lines.')
 
     # backup data
-    backup_input_data('/mnt/d/Projects/github/graph_ql_challenge/Input/')
+    backup_input_data(work_space +'/Input/')
 
 def backup_input_data(src_dir):
     import datetime
@@ -83,15 +117,54 @@ def write_output_csv(seeker_master_output, src_dir):
         fc.writeheader()
         fc.writerows(toCSV)
 
-if __name__ == "__main__":
-    executor = Seeker("bolt://18.140.2.236:7687", "neo4j", "hungle")
-    work_space = '/mnt/d/Projects/github/graph_ql_challenge'
+def add_all_node_from_csv(executor, path_input, work_space):
+    header = None
+    with open(path_input) as csv_file:
+        csv_data = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_data:
+            if line_count == 0:
+                print(f'Column names are :{", ".join(row)}')
+                header = row
+                line_count += 1
+            else:
+                print(f'{row[0]}, {row[1]}, {row[2]}, {row[3]}')
+                executor.add_seekers(row[0],row[1],row[2],row[3])
+                line_count += 1
+        print(f'Processed {line_count} lines.')
 
-    exec_with_csv_data(executor, work_space + '/Input/seekers.csv')
+    # backup data
+    backup_input_data(work_space +'/Input/')
+
+def add_iterable_node(executor, work_space):
+    exec_with_csv_data(executor, work_space + '/Input/seekers.csv', work_space)
     seekers = executor.get_results()
     backup_output_data(work_space + '/Output/')
     write_output_csv(seekers, work_space)
+
+def process_all_node(executor, work_space):
+    add_all_node_from_csv(executor, work_space + '/Input/seekers.csv', work_space)
+    executor.merge_all_seekers()
+    seekers = executor.get_results()
+    backup_output_data(work_space + '/Output/')
+    write_output_csv(seekers, work_space)
+
+def process_all_node_in_one_query(executor, work_space):
+    add_all_node_from_csv(executor, work_space + '/Input/seekers.csv', work_space)
+    seekers = executor.merge_all_seekers_and_return()
+    backup_output_data(work_space + '/Output/')
+    write_output_csv(seekers, work_space)
+
+
+
+if __name__ == "__main__":
+    executor = Seeker("bolt://localhost:7687", "neo4j", "dominic")
+    work_space = '/mnt/d/Projects/github/graph_ql_challenge'
     
-    print(seekers)
+    # add_iterable_node(executor, work_space)
+
+    # process_all_node(executor, work_space)
+
+    process_all_node_in_one_query(executor, work_space)
 
     executor.close()

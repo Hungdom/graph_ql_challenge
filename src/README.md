@@ -61,15 +61,17 @@ sid, name, email, phone
     MERGE (a:Seeker {sid:2, name:"aab", email: "aaa@g.com", phone:12333})
     ON CREATE SET a._id = id(a)
 
-    MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
-    and a.sid = 2 and b.sid <> 2
-    SET a.id = b.id
-    MERGE (a)-[r:link]->(b);
+    MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone )
+    and a.sid <> b.sid
+    SET a._id = id(b)
+    MERGE (a)-[r:link]->(b)
+    RETURN a._id, a.sid
+
 
     MERGE (a:Seeker {sid:3, name:"abb", email: "aaa@g.com", phone:12222})
     ON CREATE SET a.id = id(a)
 
-    MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
+    MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone )
     and a.sid = 3 and b.sid <> 3
         SET a.id = b.id
     MERGE (a)-[r:link]->(b);
@@ -77,7 +79,7 @@ sid, name, email, phone
     MERGE (a:Seeker {sid:4, name:"ddd", email: "ddd@g.com", phone:12222})
     ON CREATE SET a.id = id(a)
 
-    MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone ) 
+    MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone )
     and a.sid = 4 and b.sid <> 4
         SET a.id = b.id
     MERGE (a)-[r:link]->(b);
