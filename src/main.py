@@ -67,11 +67,12 @@ class Seeker:
     def merge_all_seekers_and_return(self):
         with self.driver.session() as session:
             seekers = []
-            result = session.run("MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) "
-                                    "and a.sid <> b.sid "
-                                    "SET b._id = id(a) "
+            result = session.run(
+                                    "MATCH (a:Seeker), (b:Seeker) WHERE (a.email = b.email OR a.phone = b.phone) "
+                                    "AND a.sid <> b.sid "
+                                    "SET b._id=a._id "
                                     "MERGE (a)-[r:link]->(b) "
-                                    "RETURN DISTINCT a._id as ID, a.sid as SID")
+                                    "RETURN DISTINCT a._id as ID, a.sid as SID ; ")
             for record in result:
                 seekers.append({'id':record["ID"], 'sid': record["SID"]})
             return seekers
@@ -151,7 +152,7 @@ def process_all_node(executor, work_space):
     write_output_csv(seekers, work_space)
 
 def process_all_node_in_one_query(executor, work_space):
-    add_all_node_from_csv(executor, work_space + '/Input/seekers.csv', work_space)
+    # add_all_node_from_csv(executor, work_space + '/Input/seekers.csv', work_space)
     seekers = executor.merge_all_seekers_and_return()
     backup_output_data(work_space + '/Output/')
     write_output_csv(seekers, work_space)
@@ -166,6 +167,8 @@ if __name__ == "__main__":
 
     # process_all_node(executor, work_space)
     
-    process_all_node_in_one_query(executor, work_space)
+    add_all_node_from_csv(executor, work_space + '/Input/seekers.csv', work_space)
+
+    # process_all_node_in_one_query(executor, work_space)
 
     executor.close()
